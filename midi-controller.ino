@@ -31,6 +31,7 @@ const int SILENCE = 0x00;
 
 /*MIDI notes*/
 const int KEY_NOTE = 0x2E; //F#_5
+int CURRENT_BASE_NOTE = KEY_NOTE;
 //MAJOR 1, MINOR = 2 DIMINISHED = 3
 int currentScaleType = 1;
 
@@ -106,10 +107,10 @@ void setup() {
   pinMode(BUTTON6, INPUT_PULLUP);
   pinMode(BUTTON7, INPUT_PULLUP);
 
-  //pinMode(JOYUP, INPUT_PULLUP);
-  //pinMode(JOYDOWN, INPUT_PULLUP);
-  //pinMode(JOYRIGHT, INPUT_PULLUP);
-  //pinMode(JOYLEFT, INPUT_PULLUP);
+  pinMode(JOYUP, INPUT_PULLUP);
+  pinMode(JOYDOWN, INPUT_PULLUP);
+  pinMode(JOYRIGHT, INPUT_PULLUP);
+  pinMode(JOYLEFT, INPUT_PULLUP);
 
 }
 
@@ -156,22 +157,45 @@ void loop() {
       joyLeftState != joyLeftPrevState ||
       joyRightState != joyRightPrevState)
     joyStickHandler();
-  delay(100);
+  delay(1);
 }
 
 void joyStickHandler() {
-  return;
+  //when state has changed and joystick has returned to middle, do nothing.
+  if(joyUpState == joyDownState == joyRightState == joyLeftState == LOW){
+    return;
+    }
+    //need to traspose playng notes.
+    //first should silence current,
+    //then update base key
+    //finally re-trigger play note
+    silencePlayingNotes();
+  switch( getJoyStickPosition()){
+    //UP
+    case 1 : CURRENT_BASE_NOTE= KEY_NOTE+1;
+    break;
+    case 2 : CURRENT_BASE_NOTE = KEY_NOTE+2;
+    break;
+    case 3 : CURRENT_BASE_NOTE = KEY_NOTE+3;
+    break;
+    case 4 : CURRENT_BASE_NOTE = KEY_NOTE+4;
+    }
+    resumePlayingNotes();    
+    joyUpPrevState = joyUpState;
+    joyDownPrevState = joyDownState;
+    joyRightPrevState = joyRightState;
+    joyLeftPrevState = joyLeftState;
 }
 
 //will play the key note
 void button1Handler() {
   buttonPrevState1 = buttonState1;
-  digitalWrite(, buttonState1);
+  digitalWrite(LED1, buttonState1);
   if (buttonState1 == HIGH) {
     //Serial.println("Button 1 is pressed");
-    noteOn(PLAY, KEY_NOTE , MED_VEL);
+    noteOn(PLAY, CURRENT_BASE_NOTE , MED_VEL);
   } else {
-    noteOn(PLAY, KEY_NOTE , SILENCE);
+    noteOn(PLAY, CURRENT_BASE_NOTE , SILENCE);
   }
 }
 
