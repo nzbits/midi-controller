@@ -31,6 +31,7 @@ const int SILENCE = 0x00;
 
 /*MIDI notes*/
 const int KEY_NOTE = 0x2E; //F#_5
+int currentBaseNote = KEY_NOTE;
 //MAJOR 1, MINOR = 2 DIMINISHED = 3
 int currentScaleType = 1;
 
@@ -54,14 +55,15 @@ const int minorTriadIndex[] = {0, 2, 4};
 /*Ionian*/
 /*Since we will be using joystick to control the position in the progression
   I added 12th and 14th offset*/
-const int IONIAN_PROGRESSION_OFFSET[] = {0, 2, 4, 5, 7, 9, 11, 12, 14};
+const int IONIAN_PROGRESSION_OFFSET[] = {0, 2, 4, 5, 7, 9, 11, 12};
 
 /*Progressions
    M major
    m minor
    d dim
 */
-const char IONIAN_PROGRESSION_TYPE[] = "MmmMMmd";
+//changed to use integers to match current scaletype
+const char IONIAN_PROGRESSION_TYPE[] = {0,1,2,2,1,1,2,3,1};
 
 
 /*VARIABLES FOR STORING STATE OF THE BUTTONS*/
@@ -106,10 +108,10 @@ void setup() {
   pinMode(BUTTON6, INPUT_PULLUP);
   pinMode(BUTTON7, INPUT_PULLUP);
 
-  //pinMode(JOYUP, INPUT_PULLUP);
-  //pinMode(JOYDOWN, INPUT_PULLUP);
-  //pinMode(JOYRIGHT, INPUT_PULLUP);
-  //pinMode(JOYLEFT, INPUT_PULLUP);
+  pinMode(JOYUP, INPUT_PULLUP);
+  pinMode(JOYDOWN, INPUT_PULLUP);
+  pinMode(JOYRIGHT, INPUT_PULLUP);
+  pinMode(JOYLEFT, INPUT_PULLUP);
 
 }
 
@@ -127,7 +129,7 @@ void loop() {
   joyDownState = digitalRead(JOYDOWN);
   joyLeftState = digitalRead(JOYLEFT);
   joyRightState = digitalRead(JOYRIGHT);
-
+  
 
   if (buttonState1 != buttonPrevState1) {
     button1Handler();
@@ -156,22 +158,45 @@ void loop() {
       joyLeftState != joyLeftPrevState ||
       joyRightState != joyRightPrevState)
     joyStickHandler();
-  delay(100);
+  delay(1);
 }
 
 void joyStickHandler() {
-  return;
+  joyUpPrevState = joyUpState;
+    joyDownPrevState = joyDownState;
+    joyRightPrevState = joyRightState;
+    joyLeftPrevState = joyLeftState;
+  //when state has changed and joystick has returned to middle, do nothing.
+  if(joyUpState == LOW && joyDownState == LOW && joyRightState == LOW && joyLeftState == LOW){
+    return;
+    }
+  
+    //need to traspose playng notes.
+    //first should silence current,
+    //then update base key
+    //finally re-trigger play note
+    silencePlayingNotes();
+    int joyStickPosition= getJoyStickPosition();
+    
+    currentScaleType = IONIAN_PROGRESSION_TYPE[joyStickPosition];
+    currentBaseNote = KEY_NOTE+ IONIAN_PROGRESSION_OFFSET[joyStickPosition-1];
+    
+    resumePlayingNotes();    
+    joyUpPrevState = joyUpState;
+    joyDownPrevState = joyDownState;
+    joyRightPrevState = joyRightState;
+    joyLeftPrevState = joyLeftState;
 }
 
 //will play the key note
 void button1Handler() {
   buttonPrevState1 = buttonState1;
-  digitalWrite(, buttonState1);
+  digitalWrite(LED1, buttonState1);
   if (buttonState1 == HIGH) {
     //Serial.println("Button 1 is pressed");
-    noteOn(PLAY, KEY_NOTE , MED_VEL);
+    noteOn(PLAY, currentBaseNote , MED_VEL);
   } else {
-    noteOn(PLAY, KEY_NOTE , SILENCE);
+    noteOn(PLAY, currentBaseNote , SILENCE);
   }
 }
 
