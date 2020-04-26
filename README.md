@@ -23,6 +23,8 @@ Connect midi cable to any compatible midi receptor sinthetizer (I used KORG volc
 it shold reproduce sound while pressing any button.
 ## Built With
 
+* [Full project] https://create.arduino.cc/projecthub/zombits/volcade-arcade-scale-progression-controller-7a1b81
+
 * [Arduino] https://www.arduino.cc/o/rome/) - used for IDE and uploading code.
 
 ## Authors
