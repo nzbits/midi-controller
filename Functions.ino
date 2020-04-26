@@ -2,33 +2,31 @@
    All of the calcultaions will e done here
 */
 
-/*
-   All of the calcultaions will e done here
-*/
-
-int getNextNote(char type, int keyNote , int currentNoteIndex) {
-  int offsetIndex;
-  int offset;
-  return 0;
-}
-
 int getNoteForButton (int buttonNumber) {
   switch (currentScaleType) {
-    case 1: return CURRENT_BASE_NOTE + MAJOR[buttonNumber - 1];
-    case 2: return CURRENT_BASE_NOTE + MINOR[buttonNumber - 1];
-    case 3: return CURRENT_BASE_NOTE + DIMINISHED[buttonNumber - 1];
+    case 1: return currentBaseNote + MAJOR[buttonNumber - 1];
+    case 2: return currentBaseNote + MINOR[buttonNumber - 1];
+    case 3: return currentBaseNote + DIMINISHED[buttonNumber - 1];
   }
 }
 
 int getJoyStickPosition () {
   //up
-  if (joyUpState == HIGH && joyDownState == joyLeftState == joyRightState) return 1;
-  //down
-  if (joyDownState == HIGH && joyUpState == joyLeftState == joyRightState) return 2;
-  //left
-  if (joyLeftState == HIGH && joyDownState == joyUpState == joyRightState) return 3;
+  if (joyUpState == HIGH && joyDownState == LOW && joyLeftState == LOW && joyRightState == LOW) return 1;
+  //up/right
+  if (joyUpState == HIGH && joyDownState == LOW && joyLeftState == LOW && joyRightState == HIGH) return 2;
   //right
-  if (joyRightState == HIGH && joyDownState == joyLeftState == joyUpState ) return 4;
+  if (joyRightState == HIGH && joyDownState == LOW && joyLeftState == LOW && joyUpState == LOW) return 3;
+  //right/down
+  if (joyRightState == HIGH && joyDownState == HIGH && joyLeftState == LOW && joyUpState == LOW) return 4;  
+  //down
+  if (joyDownState == HIGH && joyUpState == LOW && joyLeftState == LOW && joyRightState == LOW ) return 5;
+  //down/left
+  if (joyRightState == LOW && joyDownState == HIGH && joyLeftState == HIGH && joyUpState == LOW) return 6;
+  //left
+  if (joyLeftState == HIGH && joyDownState == LOW && joyUpState == LOW && joyRightState ==  LOW ) return 7;
+  //left/up
+  if (joyRightState == LOW && joyDownState == LOW && joyLeftState == HIGH && joyUpState == HIGH) return 8;
   //default
   return 1;
 }
